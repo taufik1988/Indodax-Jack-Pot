@@ -1,0 +1,548 @@
+<!DOCTYPE html1>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indodax Asset Manager & Slot Simulation v3</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0b1426;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background: #131f37;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            overflow: hidden;
+            border: 1px solid #223254;
+        }
+
+        /* Header App Indodax Style */
+        .app-header {
+            padding: 16px 20px;
+            background: #182846;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #223254;
+        }
+
+        .app-header .logo {
+            font-weight: 800;
+            font-size: 18px;
+            color: #2196f3;
+            letter-spacing: 0.5px;
+        }
+
+        .app-header .badge-lite {
+            background: #1a3a60;
+            color: #64b5f6;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        /* Total Balance Card */
+        .balance-card {
+            padding: 20px;
+            background: linear-gradient(180deg, #182846 0%, #131f37 100%);
+            text-align: left;
+        }
+
+        .balance-label {
+            font-size: 12px;
+            color: #8fa0c0;
+            margin-bottom: 6px;
+        }
+
+        .balance-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .balance-sub {
+            font-size: 12px;
+            color: #8fa0c0;
+            margin-bottom: 18px;
+        }
+
+        /* Action Buttons */
+        .action-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-setor {
+            background: #0084ff;
+            color: #ffffff;
+        }
+
+        .btn-setor:hover {
+            background: #006ddb;
+        }
+
+        .btn-tarik {
+            background: #223254;
+            color: #ffffff;
+        }
+
+        .btn-tarik:hover {
+            background: #2c406b;
+        }
+
+        /* Slot / Game Section */
+        .game-section {
+            padding: 16px 20px;
+            background: #0f192d;
+            border-top: 1px solid #223254;
+            border-bottom: 1px solid #223254;
+        }
+
+        .game-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #ffca28;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .slot-display {
+            display: flex;
+            justify-content: space-around;
+            background: #070d19;
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid #223254;
+            margin-bottom: 12px;
+            font-size: 32px;
+        }
+
+        .btn-spin {
+            width: 100%;
+            padding: 12px;
+            background: #e91e63;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
+        }
+
+        .btn-spin:disabled {
+            background: #555;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Asset List (Koin Besar & Kecil) */
+        .asset-section {
+            padding: 16px 20px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            color: #8fa0c0;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .coin-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #1a2942;
+        }
+
+        .coin-item:last-child {
+            border-bottom: none;
+        }
+
+        .coin-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .coin-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #223254;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .coin-details .name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .coin-details .category {
+            font-size: 11px;
+            color: #8fa0c0;
+        }
+
+        .coin-value {
+            text-align: right;
+        }
+
+        .coin-value .amount {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .coin-value .idr {
+            font-size: 11px;
+            color: #8fa0c0;
+        }
+
+        .profit-pos { color: #4caf50; }
+        .profit-neg { color: #f44336; }
+
+        /* Modal Setor / Deposit */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background: #182846;
+            padding: 24px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid #223254;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            color: #8fa0c0;
+            margin-bottom: 6px;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 10px;
+            background: #0f192d;
+            border: 1px solid #223254;
+            border-radius: 6px;
+            color: #fff;
+            outline: none;
+        }
+
+        .btn-modal-submit {
+            width: 100%;
+            padding: 12px;
+            background: #0084ff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-modal-close {
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            color: #8fa0c0;
+            border: none;
+            margin-top: 6px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Header App -->
+    <div class="app-header">
+        <div class="logo">INDODAX <span class="badge-lite">LITE</span></div>
+        <div style="font-size: 12px; color: #8fa0c0;">ID: 883921</div>
+    </div>
+
+    <!-- Balance Card -->
+    <div class="balance-card">
+        <div class="balance-label">Estimasi Nilai Aset</div>
+        <div class="balance-value" id="totalBalanceIDR">8.899 IDR</div>
+        <div class="balance-sub" id="totalBalanceBTC">≈ 0,00000625 BTC</div>
+
+        <div class="action-group">
+            <button class="btn-action btn-setor" onclick="openSetorModal()">Setor / Deposit</button>
+            <button class="btn-action btn-tarik" onclick="alert('Fitur Penarikan Online/Offline aktif!')">Tarik Saldo</button>
+        </div>
+    </div>
+
+    <!-- Slot Machine Koin Game -->
+    <div class="game-section">
+        <div class="game-title">🎰 PUTAR SLOT KOIN (Kecil & Besar)</div>
+        <div class="slot-display">
+            <div id="slot1">₿</div>
+            <div id="slot2">💎</div>
+            <div id="slot3">🚀</div>
+        </div>
+        <button class="btn-spin" id="spinBtn" onclick="spinSlot()">PUTAR (Biaya 100 IDR)</button>
+    </div>
+
+    <!-- Daftar Aset Koin (Besar & Kecil) -->
+    <div class="asset-section">
+        <div class="section-title">Aset Portofolio Anda</div>
+
+        <!-- Rupiah -->
+        <div class="coin-item">
+            <div class="coin-info">
+                <div class="coin-icon" style="background: #0084ff; color: #fff;">IDR</div>
+                <div class="coin-details">
+                    <div class="name">Rupiah</div>
+                    <div class="category">Mata Uang FIAT</div>
+                </div>
+            </div>
+            <div class="coin-value">
+                <div class="amount" id="rupiahAmount">2.933 IDR</div>
+            </div>
+        </div>
+
+        <!-- JUP (Koin Kecil/Altcoin) -->
+        <div class="coin-item">
+            <div class="coin-info">
+                <div class="coin-icon" style="background: #2e7d32; color: #fff;">JUP</div>
+                <div class="coin-details">
+                    <div class="name">Jupiter</div>
+                    <div class="category">Koin Kecil • <span class="profit-neg">-77,45%</span></div>
+                </div>
+            </div>
+            <div class="coin-value">
+                <div class="amount" id="jupAmount">0,8351 JUP</div>
+                <div class="idr">3.371 IDR</div>
+            </div>
+        </div>
+
+        <!-- DGB (Koin Kecil) -->
+        <div class="coin-item">
+            <div class="coin-info">
+                <div class="coin-icon" style="background: #1565c0; color: #fff;">DGB</div>
+                <div class="coin-details">
+                    <div class="name">DigiByte</div>
+                    <div class="category">Koin Kecil • <span class="profit-neg">-45,75%</span></div>
+                </div>
+            </div>
+            <div class="coin-value">
+                <div class="amount" id="dgbAmount">20 DGB</div>
+                <div class="idr">1.620 IDR</div>
+            </div>
+        </div>
+
+        <!-- LTC (Koin Besar) -->
+        <div class="coin-item">
+            <div class="coin-info">
+                <div class="coin-icon" style="background: #37474f; color: #fff;">LTC</div>
+                <div class="coin-details">
+                    <div class="name">Litecoin</div>
+                    <div class="category">Koin Utama • <span class="profit-neg">-50,40%</span></div>
+                </div>
+            </div>
+            <div class="coin-value">
+                <div class="amount" id="ltcAmount">0,001057 LTC</div>
+                <div class="idr">955 IDR</div>
+            </div>
+        </div>
+
+        <!-- TMG (Koin Micro) -->
+        <div class="coin-item">
+            <div class="coin-info">
+                <div class="coin-icon" style="background: #c62828; color: #fff;">TMG</div>
+                <div class="coin-details">
+                    <div class="name">T-mac DAO</div>
+                    <div class="category">Koin Micro • <span class="profit-neg">-99,86%</span></div>
+                </div>
+            </div>
+            <div class="coin-value">
+                <div class="amount" id="tmgAmount">0,0269 TMG</div>
+                <div class="idr">17 IDR</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Setor Deposit (Online & Offline) -->
+<div class="modal" id="setorModal">
+    <div class="modal-content">
+        <div class="modal-title">Setor Aset / Deposit ke Indodax</div>
+        
+        <div class="input-group">
+            <label>Metode Deposit (Online / Offline):</label>
+            <select id="depositMethod">
+                <option value="online_qris">Online - QRIS / E-Wallet (Instant)</option>
+                <option value="online_va">Online - Virtual Account Bank</option>
+                <option value="offline_counter">Offline - Transfer OTC / Kasir / Minimarket</option>
+                <option value="crypto_transfer">Transfer Koin Kripto Direct (On-Chain)</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Pilih Aset Koin / FIAT:</label>
+            <select id="depositAsset">
+                <option value="IDR">Rupiah (IDR)</option>
+                <option value="BTC">Bitcoin (BTC) - Koin Besar</option>
+                <option value="JUP">Jupiter (JUP) - Koin Kecil</option>
+                <option value="DGB">DigiByte (DGB) - Koin Kecil</option>
+                <option value="LTC">Litecoin (LTC) - Koin Utama</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Jumlah Setoran (Nominal IDR):</label>
+            <input type="number" id="depositAmount" value="50000" placeholder="Masukkan nominal">
+        </div>
+
+        <button class="btn-modal-submit" onclick="processDeposit()">Konfirmasi & Setor</button>
+        <button class="btn-modal-close" onclick="closeSetorModal()">Batal</button>
+    </div>
+</div>
+
+<script>
+    let currentRupiah = 2933;
+    const coins = ['₿', '💎', '🚀', '⚡', '🏆', '🪙'];
+
+    function updateDisplay() {
+        document.getElementById('rupiahAmount').innerText = currentRupiah.toLocaleString('id-ID') + ' IDR';
+        
+        // Total estimasi kasar (Rupiah + Nilai Koin ~5.966)
+        let totalAsset = currentRupiah + 5966;
+        document.getElementById('totalBalanceIDR').innerText = totalAsset.toLocaleString('id-ID') + ' IDR';
+        let btcVal = (totalAsset / 1422424000).toFixed(8);
+        document.getElementById('totalBalanceBTC').innerText = '≈ ' + btcVal + ' BTC';
+    }
+
+    function openSetorModal() {
+        document.getElementById('setorModal').style.display = 'flex';
+    }
+
+    function closeSetorModal() {
+        document.getElementById('setorModal').style.display = 'none';
+    }
+
+    function processDeposit() {
+        let amount = parseInt(document.getElementById('depositAmount').value);
+        let method = document.getElementById('depositMethod').options[document.getElementById('depositMethod').selectedIndex].text;
+        let asset = document.getElementById('depositAsset').value;
+
+        if (isNaN(amount) || amount <= 0) {
+            alert('Masukkan jumlah setoran yang valid!');
+            return;
+        }
+
+        currentRupiah += amount;
+        updateDisplay();
+        closeSetorModal();
+
+        alert(`[SETORAN BERHASIL]
+
+Metode: ${method}
+Aset: ${asset}
+Nominal: Rp ${amount.toLocaleString('id-ID')}
+
+Saldo Indodax Anda telah bertambah secara otomatis!`);
+    }
+
+    function spinSlot() {
+        if (currentRupiah < 100) {
+            alert('Saldo Rupiah tidak mencukupi untuk memutar slot! Silakan lakukan setoran.');
+            return;
+        }
+
+        currentRupiah -= 100;
+        updateDisplay();
+
+        const btn = document.getElementById('spinBtn');
+        btn.disabled = true;
+
+        let counter = 0;
+        const interval = setInterval(() => {
+            document.getElementById('slot1').innerText = coins[Math.floor(Math.random() * coins.length)];
+            document.getElementById('slot2').innerText = coins[Math.floor(Math.random() * coins.length)];
+            document.getElementById('slot3').innerText = coins[Math.floor(Math.random() * coins.length)];
+            counter++;
+
+            if (counter > 15) {
+                clearInterval(interval);
+                btn.disabled = false;
+                
+                let s1 = document.getElementById('slot1').innerText;
+                let s2 = document.getElementById('slot2').innerText;
+                let s3 = document.getElementById('slot3').innerText;
+
+                if (s1 === s2 && s2 === s3) {
+                    let win = 5000;
+                    currentRupiah += win;
+                    updateDisplay();
+                    alert(`🎉 JACKPOT INDODAX! Anda mendapatkan ${win.toLocaleString('id-ID')} IDR!`);
+                } else if (s1 === s2 || s2 === s3 || s1 === s3) {
+                    let win = 500;
+                    currentRupiah += win;
+                    updateDisplay();
+                    alert(`👍 MENANG KOIN! Anda mendapatkan ${win.toLocaleString('id-ID')} IDR!`);
+                }
+            }
+        }, 100);
+    }
+
+    updateDisplay();
+</script>
+
+</body>
+</html>
